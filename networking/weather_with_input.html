@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8" />
+    <title>Front End Development / React</title>
+</head>
+
+<body>
+    <!-- We will put our React component inside this div. -->
+    <div id="root"></div>
+
+    <!-- Load React & Babel -->
+    <!-- Note: when deploying, replace "development.js" with "production.min.js". -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+    <script src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+
+    <!-- Load our React component. -->
+    <script type="text/babel">
+        //Component
+function WeatherWithInput() {
+
+    const [temperature, setTemperature] = React.useState('');
+    const [weather, setWeather] = React.useState('');
+    const [icon, setIcon] = React.useState('');
+    const [cityInput, setCityInput] = React.useState('');
+    const [cityApi, setCityApi] = React.useState('');
+    const [isClicked, setClicked] = React.useState(false);
+
+    const fetchWeather = () => {
+        setClicked(true);
+        
+        fetch('https://api.openweathermap.org/data/2.5/weather?q=' + cityInput + '&APPID=315a04605a0c010fea53585e9cdfa183&units=metric')
+        .then(response => response.json())
+        .then(responseData => {
+            const jsonTemp = responseData.main.temp;
+            const tempString = JSON.stringify(jsonTemp);
+            const temp = tempString.split(".");
+
+            setTemperature(temp[0]);
+            setWeather(responseData.weather[0].main);
+            setIcon('https://openweathermap.org/img/wn/' + responseData.weather[0].icon + '@2x.png');
+            setCityApi(responseData.name);
+
+        })
+        .catch(err => console.error(err))
+    };
+
+    const inputChanged = (event) => {
+        setCityInput(event.target.value);
+    }
+
+    if (!isClicked) {
+        return(
+            <div>
+                <input value={cityInput} onChange={inputChanged}/>
+                <button onClick={fetchWeather}>Get weather</button>
+            </div>
+        );
+    }
+    else {
+        return(
+            <div>
+                <input value={cityInput} onChange={inputChanged}/>
+                <button onClick={fetchWeather}>Get weather</button>
+                <h1>{cityApi} weather</h1>
+                <p>Temperature: {temperature} Celcuis</p>
+                <p>Weather: {weather}</p>
+                <img src={icon} alt="weatehr icon" />
+            </div>
+        );
+    }
+}
+
+//Root element
+const root = ReactDOM.createRoot(document.getElementById('root'));
+
+//Initial render
+root.render(<WeatherWithInput />);
+    </script>
+</body>
+
+</html>
