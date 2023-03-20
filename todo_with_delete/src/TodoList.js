@@ -33,11 +33,9 @@ function TodoList() {
   const [isClicked, setIsClicked] = useState(false);
 
   const [datePicker, setDatePicker] = useState({});
-  const [dateStr, setDateStr] = useState('');
 
   //Add task
   const addTodo = () => {
-    // is the event param necessary?
     setIsClicked(true);
     setTodoList([...todoList, todo]);
     setTodo({ ...todo, desc: '' });
@@ -53,7 +51,6 @@ function TodoList() {
   const pickerChanged = pickerObject => {
     setDatePicker(pickerObject);
     setTodo({ ...todo, date: pickerObject.$d.toLocaleDateString('fi-FI') });
-    console.log(pickerObject);
   };
 
   if (!isClicked || todoList.length === 0) {
@@ -120,13 +117,12 @@ function TodoList() {
           <Typography variant="h6" gutterBottom>
             To-do list
           </Typography>
-          {/* Testing table MUI */}
           <TableContainer component={Paper} style={{ width: '50%' }}>
             <Table aria-label="simple table">
               <TableHead>
                 <TableRow>
-                  <TableCell align="center">Date</TableCell>
-                  <TableCell align="center">Description</TableCell>
+                  <TableCell align="right">Date</TableCell>
+                  <TableCell align="left">Description</TableCell>
                   <TableCell></TableCell>
                 </TableRow>
               </TableHead>
@@ -136,13 +132,10 @@ function TodoList() {
                     key={index}
                     sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
                   >
-                    {/* <TableCell component="th" scope="row">
-                {row.date}
-              </TableCell> */}
-                    <TableCell component="th" scope="row">
+                    <TableCell component="th" scope="row" align="right">
                       {row.date}
                     </TableCell>
-                    <TableCell>{row.desc}</TableCell>
+                    <TableCell align="left">{row.desc}</TableCell>
                     <TableCell align="right">
                       <Button
                         size="small"
@@ -159,7 +152,6 @@ function TodoList() {
               </TableBody>
             </Table>
           </TableContainer>
-          {/* END Testing table MUI */}
         </div>
       </LocalizationProvider>
     );
