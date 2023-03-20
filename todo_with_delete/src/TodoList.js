@@ -1,58 +1,169 @@
-import React, {useState } from "react";
+import React, { useState } from 'react';
+import { flushSync } from 'react-dom';
 
-function TodoList () {
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
-    const [todo, setTodo]  = useState({description: '', date: ''});
-    const [todoList, setTodoList] = useState([]);
-    const [isClicked, setIsClicked] = useState(false);
+import TextField from '@mui/material/TextField';
+import Stack from '@mui/material/Stack';
+import Button from '@mui/material/Button';
+import Typography from '@mui/material/Typography';
 
-    //Add task 
-    const addTodo = event => { // is the event param necessary?
-        setIsClicked(true);
-        setTodoList([...todoList, todo]);
-        setTodo({description: '', date: ''});
-    }
+/*Testing table MUI*/
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import Paper from '@mui/material/Paper';
+/*END Testing table MUI*/
 
-    //Delete task
-    const deleteTodo = (index) => {
-        setTodoList(todoList.filter( (todo, i) => i !== index))
-    }
+/* Importing Roboto fonts*/
+import '@fontsource/roboto/300.css';
+import '@fontsource/roboto/400.css';
+import '@fontsource/roboto/500.css';
+import '@fontsource/roboto/700.css';
+/* END Importing Roboto fonts*/
 
-    //Input state
-    const inputChanged = event => {
-        setTodo({...todo,[event.target.name]:event.target.value});
-    }
+function TodoList() {
+  const [todo, setTodo] = useState({ desc: '', date: '' });
+  const [todoList, setTodoList] = useState([]);
+  const [isClicked, setIsClicked] = useState(false);
 
-    if(!isClicked || todoList.length === 0) {
-        return (
-            <div>
-                <h1>Simple Todolist</h1>
-                Description: <input name="description" type="text" value={todo.description} onChange={inputChanged} />
-                Date: <input name="date" type="text" value={todo.date} onChange={inputChanged}/>
-                <button onClick={addTodo}>Add</button>
-            </div>
-        )
-    }
-    else {
-        return(
-            <div>
-                <h1>Simple Todolist</h1>
-                Description: <input name="description" type="text" value={todo.description} onChange={inputChanged} />
-                Date: <input name="date" type="text" value={todo.date} onChange={inputChanged}/>
-                <button onClick={addTodo}>Add</button>
-                <table><tbody>
-                    <tr><th>Date</th><th>Description</th><th></th></tr>
-                    {todoList.map( (todo, index) => 
-                        <tr key={index}>
-                            <td>{todo.date}</td>
-                            <td>{todo.description}</td>
-                            <td><button onClick={ () => {deleteTodo(index)}}>Delete</button></td>
-                        </tr>
-                    )}
-                </tbody></table>
-            </div>
-        )
-    }
+  const [datePicker, setDatePicker] = useState({});
+  const [dateStr, setDateStr] = useState('');
+
+  //Add task
+  const addTodo = () => {
+    // is the event param necessary?
+    setIsClicked(true);
+    setTodoList([...todoList, todo]);
+    setTodo({ ...todo, desc: '' });
+    setDatePicker({});
+  };
+
+  //Delete task
+  const deleteTodo = index => {
+    setTodoList(todoList.filter((todo, i) => i !== index));
+  };
+
+  //Picker changed
+  const pickerChanged = pickerObject => {
+    setDatePicker(pickerObject);
+    setTodo({ ...todo, date: pickerObject.$d.toLocaleDateString('fi-FI') });
+    console.log(pickerObject);
+  };
+
+  if (!isClicked || todoList.length === 0) {
+    return (
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="h3" gutterBottom>
+            New task
+          </Typography>
+          <Stack direction="row" spacing={2} style={{ marginBottom: '50px' }}>
+            <TextField
+              label="Description"
+              value={todo.desc}
+              onChange={event => {
+                setTodo({ ...todo, desc: event.target.value });
+              }}
+            />
+            <DatePicker
+              value={datePicker}
+              onChange={pickerObj => pickerChanged(pickerObj)}
+            />
+            <Button size="large" variant="outlined" onClick={addTodo}>
+              Add
+            </Button>
+          </Stack>
+        </div>
+      </LocalizationProvider>
+    );
+  } else {
+    return (
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+          }}
+        >
+          <Typography variant="h3" gutterBottom>
+            New task
+          </Typography>
+          <Stack direction="row" spacing={2} style={{ marginBottom: '50px' }}>
+            <TextField
+              label="Description"
+              value={todo.desc}
+              onChange={event => {
+                setTodo({ ...todo, desc: event.target.value });
+              }}
+            />
+            <DatePicker
+              value={datePicker}
+              onChange={pickerObj => pickerChanged(pickerObj)}
+            />
+            <Button size="large" variant="outlined" onClick={addTodo}>
+              Add
+            </Button>
+          </Stack>
+          <Typography variant="h6" gutterBottom>
+            To-do list
+          </Typography>
+          {/* Testing table MUI */}
+          <TableContainer component={Paper} style={{ width: '50%' }}>
+            <Table aria-label="simple table">
+              <TableHead>
+                <TableRow>
+                  <TableCell align="center">Date</TableCell>
+                  <TableCell align="center">Description</TableCell>
+                  <TableCell></TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {todoList.map((row, index) => (
+                  <TableRow
+                    key={index}
+                    sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                  >
+                    {/* <TableCell component="th" scope="row">
+                {row.date}
+              </TableCell> */}
+                    <TableCell component="th" scope="row">
+                      {row.date}
+                    </TableCell>
+                    <TableCell>{row.desc}</TableCell>
+                    <TableCell align="right">
+                      <Button
+                        size="small"
+                        variant="contained"
+                        onClick={() => {
+                          deleteTodo(index);
+                        }}
+                      >
+                        Delete
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+          {/* END Testing table MUI */}
+        </div>
+      </LocalizationProvider>
+    );
+  }
 }
 
 export default TodoList;
