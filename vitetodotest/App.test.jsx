@@ -1,6 +1,7 @@
 import App from './src/App';
 import TodoTable from './src/TodoTable';
 import { render, screen, fireEvent, getByRole } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { test, expect } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 
@@ -20,9 +21,11 @@ test('renders todotable', () => {
   expect(table).toHaveTextContent(/go to coffee/i);
 });
 
-test('adds todo', () => {
+test('adds todos and clears list after', () => {
   //First, renders the component
   render(<App />);
+
+  //Step 1: Populating todos
 
   //Looks for the field
   const desc = screen.getByPlaceholderText('Description');
@@ -39,4 +42,15 @@ test('adds todo', () => {
   //Asserts
   const table = screen.getByRole('table');
   expect(table).toHaveTextContent(/clean the house/i);
+
+  //Step 2: Clearing todos
+  //Clear inputs
+  userEvent.clear(date);
+  userEvent.clear(desc);
+  //Find clear button and clear list
+  const clearBtn = screen.getByText(/Clear/i);
+  fireEvent.click(clearBtn);
+  //Verify that the row has been deleted
+  const doesntExistTableRow = screen.queryByText(/clean the house/i);
+  expect(doesntExistTableRow).not.toBeInTheDocument();
 });

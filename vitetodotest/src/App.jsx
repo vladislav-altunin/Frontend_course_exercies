@@ -15,6 +15,10 @@ function App() {
     setTodo({ ...todo, [event.target.name]: event.target.value });
   };
 
+  const clearTodo = () => {
+    setTodos([]);
+  };
+
   return (
     <div className="App">
       <h3>My Todolist</h3>
@@ -33,6 +37,7 @@ function App() {
         onChange={inputChanged}
       />
       <button onClick={addTodo}>Add</button>
+      <button onClick={clearTodo}>Clear</button>
       <TodoTable todos={todos} />
     </div>
   );
